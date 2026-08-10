@@ -515,7 +515,12 @@ ifeq ($(shell $(srctree)/scripts/clang-android.sh $(CC) $(CLANG_FLAGS)), y)
 $(error "Clang with Android --target detected. Did you specify CLANG_TRIPLE?")
 endif
 GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
+# Only pass --prefix when the cross toolchain is not reachable via PATH:
+# modern clang otherwise resolves the assembler to the host `as` even though
+# $(CROSS_COMPILE)as exists in the very same directory.
+ifeq ($(shell which $(CROSS_COMPILE)as),)
 CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)
+endif
 GCC_TOOLCHAIN	:= $(realpath $(GCC_TOOLCHAIN_DIR)/..)
 endif
 ifneq ($(GCC_TOOLCHAIN),)
@@ -788,6 +793,7 @@ KBUILD_CFLAGS += $(call cc-option, -Wno-sometimes-uninitialized)
 # Quiet clang warning: comparison of unsigned expression < 0 is always false
 
 KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
 # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
 # source of a reference will be _MergedGlobals and not on of the whitelisted names.
 # See modpost pattern 2
@@ -973,7 +979,12 @@ KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
 KBUILD_CFLAGS   += $(call cc-option,-Werror=implicit-int)
 
 # require functions to have arguments in prototypes, not empty 'int foo()'
+# (clang >= 22 diagnoses empty-paren declarations via -Wstrict-prototypes by
+# default and turns them into hard errors through -Werror; keep the check
+# for gcc only)
+ifneq ($(cc-name),clang)
 KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
+endif
 
 # Prohibit date/time macros, which would make the build non-deterministic
 KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
