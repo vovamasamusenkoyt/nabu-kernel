@@ -2376,6 +2376,7 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 	extern int ksu_handle_prctl(int option, unsigned long arg2,
 				    unsigned long arg3, unsigned long arg4,
 				    unsigned long arg5, long *result);
+	error = 0;
 	if (ksu_handle_prctl(option, arg2, arg3, arg4, arg5, &error))
 		return error;
 #endif
