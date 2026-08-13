@@ -1,0 +1,4 @@
+[submodule "drivers/kernelsu"]
+	path = drivers/kernelsu
+	url = git@github.com:vovamasamusenkoyt/KernelSU-Next.git
+	branch = nabu
