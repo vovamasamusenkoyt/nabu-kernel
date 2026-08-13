@@ -11,7 +11,7 @@
 - [ ] Проверить, что аудио работает (techpack вшит), камеры, GPS, BT/WiFi
 
 ## Патчи/твики на потом (по желанию)
-- [ ] GPU OC: Adreno 618 514 -> 750 МГц (`qcom,gpu-pwrlevel@0` в `arch/arm64/boot/dts/qcom/sdmshrike-gpu.dtsi`) — безопасно, + ступени при желании
+- [ ] GPU OC: база v2 уже даёт 675 МГц (Adreno 640, `sm8150-v2.dtsi:699`, `qcom,gpu-pwrlevel@0`); возможный разгон — до 750–800 МГц там же; v1-база (`sm8150-gpu.dtsi`) = 600 МГц. ВАЖНО: dtb живёт в vendor_boot.img, не в boot.img — для правок dts пересобирать vendor_boot (mkbootimg --header_version 3 --dtb)
 - [ ] CPU OC: аккуратно до 2.3–2.4 ГГц (`qcom,cpufreq-table-7` в `arch/arm64/boot/dts/qcom/sm8150-v2.dtsi`) — риск нестабильности, выше 2.2 ГГц железо не гарантирует
 - [ ] Терм: поднять CPU trip'ы 115 -> 120 °C (`arch/arm64/boot/dts/qcom/sdmshrike-thermal.dtsi`), смягчить cooling-maps (`sm8150-thermal-overlay.dtsi`)
 - [ ] Главный троттлер — vendor `thermal-engine.conf` (`/vendor/etc/`), правится на устройстве после рута
