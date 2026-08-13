@@ -56,11 +56,7 @@ void ksu_compat_sulog(uint8_t sym)
     unsigned int uid = current_uid().val;
     struct timespec64 ts;
 
-#if KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE
 	ktime_get_boottime_ts64(&ts);
-#else
-	get_monotonic_boottime(&ts);
-#endif
     entry.s_time = (uint32_t)ts.tv_sec;
     entry.data = (uint32_t)uid;
     memcpy((void *)&entry.data + 3, &sym, 1);

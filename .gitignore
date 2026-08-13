@@ -130,3 +130,6 @@ kernel/configs/android-*.cfg
 #
 Android.bp
 out
+# LTO build artifacts
+*.symversions
+drivers/net/wireguard/crypto/zinc/*/*.S
