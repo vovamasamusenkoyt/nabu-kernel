@@ -1182,12 +1182,18 @@ static int override_release(char __user *release, size_t len)
 	return ret;
 }
 
+#ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
+extern void susfs_spoof_uname(struct new_utsname* tmp);
+#endif
 SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 {
 	struct new_utsname tmp;
 
 	down_read(&uts_sem);
 	memcpy(&tmp, utsname(), sizeof(tmp));
+#ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
+	susfs_spoof_uname(&tmp);
+#endif
 	up_read(&uts_sem);
 	if (copy_to_user(name, &tmp, sizeof(tmp)))
 		return -EFAULT;
@@ -2365,6 +2371,14 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 	error = security_task_prctl(option, arg2, arg3, arg4, arg5);
 	if (error != -ENOSYS)
 		return error;
+
+#ifdef CONFIG_KSU_SUSFS
+	extern int ksu_handle_prctl(int option, unsigned long arg2,
+				    unsigned long arg3, unsigned long arg4,
+				    unsigned long arg5, long *result);
+	if (ksu_handle_prctl(option, arg2, arg3, arg4, arg5, &error))
+		return error;
+#endif
 
 	error = 0;
 	switch (option) {
